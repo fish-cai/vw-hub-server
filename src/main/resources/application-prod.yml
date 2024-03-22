@@ -1,0 +1,15 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:/Users/caiwenlin/java/vw-hub-server/vwhub.db
+
+vw:
+  hub:
+    input:
+      dir: /vw-hub-server/input
+    output:
+      dir: /vw-hub-server/output

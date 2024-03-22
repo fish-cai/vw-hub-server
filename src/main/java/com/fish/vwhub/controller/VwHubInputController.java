@@ -21,6 +21,6 @@ public class VwHubInputController {
     public ResResult upload(@RequestParam(name = "file", required = false) MultipartFile file,
                             @RequestParam(required = false) Integer fileType) {
 
-        return ResResult.success(inputService.saveUpload(file, fileType));
+        return inputService.saveUpload(file, fileType);
     }
 }
