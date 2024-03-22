@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fish.vwhub.mapper.VwHubInputMapper">
+
+    <resultMap id="BaseResultMap" type="com.fish.vwhub.entity.VwHubInput">
+            <id property="id" column="id" jdbcType="OTHER"/>
+            <result property="fileName" column="file_name" jdbcType="VARCHAR"/>
+            <result property="fileType" column="file_type" jdbcType="OTHER"/>
+            <result property="columnName" column="column_name" jdbcType="OTHER"/>
+            <result property="gmtCreate" column="gmt_create" jdbcType="TIMESTAMP"/>
+            <result property="finishTime" column="finish_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,file_name,file_type,
+        column_name,gmt_create,finish_time
+    </sql>
+</mapper>
