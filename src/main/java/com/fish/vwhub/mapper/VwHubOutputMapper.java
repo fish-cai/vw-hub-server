@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.fish.vwhub.entity.VwHubOutput;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
 * @author fish
 * @description 针对表【vw_hub_output】的数据库操作Mapper
@@ -13,5 +15,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface VwHubOutputMapper extends BaseMapper<VwHubOutput> {
 
+    List<VwHubOutput> findOutputsByInputId(Integer inputId);
 
 }

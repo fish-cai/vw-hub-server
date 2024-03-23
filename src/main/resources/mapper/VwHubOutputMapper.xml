@@ -15,4 +15,10 @@
         id,input_id,output_file_name,
         gmt_create
     </sql>
+
+    <select id="findOutputsByInputId" resultMap="BaseResultMap">
+        SELECT *
+        FROM vw_hub_output
+        WHERE input_id = #{inputId}
+    </select>
 </mapper>

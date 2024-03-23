@@ -35,6 +35,7 @@ public class VwHubInputService extends ServiceImpl<VwHubInputMapper, VwHubInput>
 
     @Resource
     VwHubInputMapper inputMapper;
+
     @Transactional(rollbackFor = Exception.class)
     public ResResult saveUpload(MultipartFile file, Integer fileType) {
         VwHubInput input = new VwHubInput();
@@ -48,12 +49,20 @@ public class VwHubInputService extends ServiceImpl<VwHubInputMapper, VwHubInput>
         } catch (IOException e) {
             log.error("文件写入失败，e:{}", e);
             e.printStackTrace();
-            return ResResult.fail("500","文件写入失败");
+            return ResResult.fail("500", "文件写入失败");
         }
         return ResResult.success(input);
     }
 
     public IPage<VwHubInput> selectPage(Page<VwHubInput> page) {
         return inputMapper.manualPage(page);
+    }
+
+    public void start(Integer id) {
+        VwHubInput input = this.getById(id);
+        String fileName = input.getFileName();
+        String inputFile = inputDir + fileName;
+        String outDir = outPutDir + id + "/";
+        //todo 执行算法文件
     }
 }

@@ -31,7 +31,7 @@ public class VwHubInput implements Serializable {
     /**
      * 
      */
-    private Object fileType;
+    private Integer fileType;
 
     /**
      * 

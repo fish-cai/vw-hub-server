@@ -38,11 +38,19 @@ public class VwHubInputController {
     public ResResult page(@RequestParam Integer current, @RequestParam Integer size) {
         IPage<VwHubInput> page = inputService.selectPage(new Page<>(current, size));
         List<VwHubInput> records = page.getRecords();
-        if (CollectionUtil.isNotEmpty(records)){
+        if (CollectionUtil.isNotEmpty(records)) {
             for (VwHubInput record : records) {
-                record.setCreateTime(LocalDateTime.ofEpochSecond(record.getGmtCreate()/1000,0, ZoneOffset.of("+8")).format(DATE_TIME_FORMATTER));
+                record.setTypeName(record.getFileType() == 1 ? "输入" : "输出");
+                record.setCreateTime(LocalDateTime.ofEpochSecond(record.getGmtCreate() / 1000, 0, ZoneOffset.of("+8")).format(DATE_TIME_FORMATTER));
             }
         }
         return ResResult.success(page);
     }
+
+    @PostMapping("/start")
+    public ResResult start(@RequestParam Integer id) {
+        inputService.start(id);
+        return ResResult.success(null);
+    }
 }
+
