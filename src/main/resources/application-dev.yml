@@ -5,13 +5,13 @@ spring:
       max-request-size: 100MB
   datasource:
     driver-class-name: org.sqlite.JDBC
-    url: jdbc:sqlite:/Users/caiwenlin/java/vw-hub-server/vwhub.db
+    url: jdbc:sqlite:/Users/yuyijun/Desktop/work/private/vw-hub-server/vwhub.db
 
 
 vw:
   hub:
     input:
-      dir: /Users/caiwenlin/java/vw-hub-server/input/
+      dir: /Users/yuyijun/Desktop/work/private/vw-hub-server/input/
     output:
       dir: /Users/caiwenlin/java/vw-hub-server/output/
 

@@ -1,6 +1,8 @@
 package com.fish.vwhub.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fish.vwhub.entity.VwHubInput;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -14,4 +16,5 @@ import org.apache.ibatis.annotations.Mapper;
 public interface VwHubInputMapper extends BaseMapper<VwHubInput> {
 
 
+    IPage<VwHubInput> manualPage(Page<VwHubInput> page);
 }

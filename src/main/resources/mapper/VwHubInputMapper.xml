@@ -8,13 +8,31 @@
             <id property="id" column="id" jdbcType="OTHER"/>
             <result property="fileName" column="file_name" jdbcType="VARCHAR"/>
             <result property="fileType" column="file_type" jdbcType="OTHER"/>
-            <result property="columnName" column="column_name" jdbcType="OTHER"/>
             <result property="gmtCreate" column="gmt_create" jdbcType="TIMESTAMP"/>
             <result property="finishTime" column="finish_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
+
+    <resultMap id="MergeResultMap" type="com.fish.vwhub.entity.VwHubInput">
+        <id property="id" column="id"/>
+        <result property="fileName" column="file_name" jdbcType="VARCHAR"/>
+        <result property="fileType" column="file_type" jdbcType="INTEGER"/>
+        <result property="gmtCreate" column="gmt_create" jdbcType="TIMESTAMP"/>
+        <result property="finishTime" column="finish_time" jdbcType="TIMESTAMP"/>
+        <collection property="results" ofType="com.fish.vwhub.entity.VwHubOutput">
+            <id property="id" column="out_id" jdbcType="INTEGER"/>
+            <result property="inputId" column="input_id" jdbcType="OTHER"/>
+            <result property="outputFileName" column="output_file_name" jdbcType="VARCHAR"/>
+            <result property="gmtCreate" column="gmt_create" jdbcType="TIMESTAMP"/>
+        </collection>
+    </resultMap>
+
     <sql id="Base_Column_List">
-        id,file_name,file_type,
-        column_name,gmt_create,finish_time
+        id,file_name,file_type,gmt_create,finish_time
     </sql>
+    <select id="manualPage" resultMap="MergeResultMap">
+        select  i.id,i.file_name,i.file_type,i.gmt_create,i.finish_time,vho.id out_id,vho.input_id,vho.output_file_name,vho.gmt_create
+        from vw_hub_input i left join vw_hub_output vho on i.id = vho.input_id
+        order by i.id desc
+    </select>
 </mapper>
