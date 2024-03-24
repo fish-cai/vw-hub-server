@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fish.vwhub.entity.ResResult;
 import com.fish.vwhub.entity.VwHubInput;
 import com.fish.vwhub.service.impl.VwHubInputService;
+import com.fish.vwhub.service.impl.VwHubOutputService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +25,9 @@ public class VwHubInputController {
 
     @Resource
     VwHubInputService inputService;
+
+    @Resource
+    VwHubOutputService outputService;
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
 
@@ -51,6 +55,11 @@ public class VwHubInputController {
     public ResResult start(@RequestParam Integer id) {
         inputService.start(id);
         return ResResult.success(null);
+    }
+
+    @GetMapping("/view")
+    public ResResult view(Integer resultId){
+        return outputService.view(resultId);
     }
 }
 
