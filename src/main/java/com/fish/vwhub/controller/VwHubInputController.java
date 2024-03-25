@@ -51,14 +51,13 @@ public class VwHubInputController {
         return ResResult.success(page);
     }
 
-    @PostMapping("/start")
-    public ResResult start(@RequestParam Integer id) {
-        inputService.start(id);
-        return ResResult.success(null);
+    @GetMapping("/start")
+    public ResResult<String> start(@RequestParam Integer id) {
+        return inputService.start(id);
     }
 
     @GetMapping("/view")
-    public ResResult view(Integer resultId){
+    public ResResult view(Integer resultId) {
         return outputService.view(resultId);
     }
 }

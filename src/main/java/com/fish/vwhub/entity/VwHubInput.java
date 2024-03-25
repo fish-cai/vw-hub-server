@@ -21,7 +21,7 @@ public class VwHubInput implements Serializable {
      * 
      */
     @TableId(type = IdType.AUTO)
-    private Object id;
+    private Integer id;
 
     /**
      * 
