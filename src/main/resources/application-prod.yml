@@ -5,11 +5,22 @@ spring:
       max-request-size: 100MB
   datasource:
     driver-class-name: org.sqlite.JDBC
-    url: jdbc:sqlite:/Users/caiwenlin/java/vw-hub-server/vwhub.db
+    url: jdbc:sqlite:/data/vwhub.db
+
 
 vw:
   hub:
     input:
-      dir: /vw-hub-server/input
+      dir: /data/input/
     output:
-      dir: /vw-hub-server/output
+      dir: /data/output/
+    map:
+      json: /data/static/map.json
+    py:
+      dir: /py/location-master/
+logging:
+  level:
+    com:
+      fish:
+        vwhub:
+          mapper: debug
