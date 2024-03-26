@@ -11,6 +11,7 @@ import com.fish.vwhub.entity.VwHubOutput;
 import com.fish.vwhub.mapper.VwHubInputMapper;
 import com.fish.vwhub.util.PyCaller;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,9 +100,9 @@ public class VwHubInputService extends ServiceImpl<VwHubInputMapper, VwHubInput>
             e.printStackTrace();
             res = null;
         }
-//        if (StringUtils.isBlank(res)){
-//            return ResResult.fail("500", "算法调用失败,请查看相关日志");
-//        }
+        if (StringUtils.isBlank(res)){
+            return ResResult.fail("500", "算法调用失败,请查看相关日志");
+        }
         log.info("算法文件：{} 调用完成，结果：{}", inputFile + fileName, res);
         saveOutRes(outDir, id);
         return ResResult.success(res);

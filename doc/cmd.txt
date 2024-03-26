@@ -1,0 +1,5 @@
+docker build -t vw-hub-server:v0.1 -f Dockerfile .
+docker tag vw-hub-server:v0.1 121.36.222.8:5000/vw-hub-server:v0.1
+docker push 121.36.222.8:5000/vw-hub-server:v0.1
+
+docker run -d -v /home/vw-hub/backend/data:/data -p 8080:8080 localhost:5000/vw-hub-server:v0.1
