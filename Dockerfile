@@ -29,7 +29,6 @@ RUN apt-get update \
 RUN apt-get update \
     && apt-get install -y \
         python3.9 \
-        python3.9-distutils \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && ln -s /usr/bin/python3.9 /usr/bin/python
@@ -40,7 +39,7 @@ RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
     && rm get-pip.py
 
 # 设置 Python 默认版本
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 ADD alg/ /py
 COPY vwhub.db /data/vwhub.db

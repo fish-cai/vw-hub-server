@@ -22,7 +22,7 @@ public class PyCaller {
         StringBuilder stringBuilder = new StringBuilder();
         List<String> cmd = new ArrayList<>();
 //        cmd.add("/usr/bin/python3");
-        cmd.add("python3.9");
+        cmd.add("python3");
         cmd.add(fileName);
         cmd.addAll(param);
         log.info("cmd = {}", cmd);
