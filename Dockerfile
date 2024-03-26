@@ -47,6 +47,7 @@ RUN pip install --no-cache-dir --upgrade pip -i https://pypi.tuna.tsinghua.edu.c
 RUN pip install -r /py/location-master/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 ADD target/vw-hub-server-1.0-SNAPSHOT.jar app.jar
+RUN mkdir /model
 ADD src/main/resources/ /config
 
 EXPOSE 8080
