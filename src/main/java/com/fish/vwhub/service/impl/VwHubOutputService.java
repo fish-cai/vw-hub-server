@@ -8,12 +8,16 @@ import com.fish.vwhub.entity.ResResult;
 import com.fish.vwhub.entity.VwHubOutput;
 import com.fish.vwhub.mapper.VwHubOutputMapper;
 import com.fish.vwhub.util.ExcelUtil;
+import com.fish.vwhub.util.FileUtil;
 import com.fish.vwhub.util.GeoUtil;
+import com.fish.vwhub.util.ResponseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -76,5 +80,15 @@ public class VwHubOutputService extends ServiceImpl<VwHubOutputMapper, VwHubOutp
         res.put("pointRes", pointRes);
         res.put("lineRes", lineRes);
         return res;
+    }
+
+    public void downLoad(HttpServletResponse response, Integer resultId) {
+        VwHubOutput output = this.getById(resultId);
+        try {
+            FileUtil.download(outDir + output.getInputId() + "/" + output.getOutputFileName(), response);
+        } catch (Exception e) {
+            log.error("文件下载失败,e:{}，resultID:{}", e, resultId);
+            ResponseUtil.responseFront(response,500,"文件不存在，请重试");
+        }
     }
 }

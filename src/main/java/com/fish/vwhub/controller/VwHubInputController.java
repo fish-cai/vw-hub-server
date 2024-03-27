@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -59,6 +60,11 @@ public class VwHubInputController {
     @GetMapping("/view")
     public ResResult view(Integer resultId) {
         return outputService.view(resultId);
+    }
+
+    @GetMapping("/downLoadOut")
+    public void downLoadOut(HttpServletResponse response, Integer resultId) {
+        outputService.downLoad(response, resultId);
     }
 }
 
