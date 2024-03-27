@@ -81,7 +81,7 @@ public class VwHubInputService extends ServiceImpl<VwHubInputMapper, VwHubInput>
     public ResResult<String> start(Integer id) {
         VwHubInput input = this.getById(id);
         String fileName = input.getFileName();
-        if (!StringUtils.contains(fileName,"input")) {
+        if (!StringUtils.containsIgnoreCase(fileName,"input")) {
             return ResResult.fail("500","当前关联的文件非输入文件，请重新操作");
         }
         String inputFile = inputDir + id + "/";
