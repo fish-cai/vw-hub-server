@@ -25,13 +25,19 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get autoremove -y && \
+        rm -rf /usr/lib/python3 /usr/local/bin/python3 /usr/local/bin/python
+
 # 安装 Python 3.9
 RUN apt-get update \
     && apt-get install -y \
         python3.9 \
+        python3.9-distutils \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    && ln -s /usr/bin/python3.9 /usr/bin/python
+    && ln -s /usr/bin/python3.9 /usr/bin/python \
+    && rm -f /usr/bin/python3 \
+    && ln -s /usr/bin/python3.9 /usr/bin/python3
 
 # 安装 pip
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
@@ -42,7 +48,7 @@ RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 ADD alg/ /py
-COPY vwhub.db /data/vwhub.db
+#COPY vwhub.db /data/vwhub.db
 RUN pip install --no-cache-dir --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
 RUN pip install -r /py/location-master/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
