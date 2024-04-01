@@ -12,6 +12,7 @@ import com.fish.vwhub.util.FileUtil;
 import com.fish.vwhub.util.GeoUtil;
 import com.fish.vwhub.util.ResponseUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +55,9 @@ public class VwHubOutputService extends ServiceImpl<VwHubOutputMapper, VwHubOutp
         for (JSONObject jo : dataList) {
             String from = jo.getString("中转库城市");
             String to = jo.getString("覆盖城市");
+            if (StringUtils.contains(from, "合肥") || StringUtils.contains(to, "合肥")) {
+                continue;
+            }
             Float[] fromPoint = GeoUtil.getGeo(from);
             Float[] toPoint = GeoUtil.getGeo(to);
             if (fromPoint == null || toPoint == null) {
@@ -88,7 +92,7 @@ public class VwHubOutputService extends ServiceImpl<VwHubOutputMapper, VwHubOutp
             FileUtil.download(outDir + output.getInputId() + "/" + output.getOutputFileName(), response);
         } catch (Exception e) {
             log.error("文件下载失败,e:{}，resultID:{}", e, resultId);
-            ResponseUtil.responseFront(response,500,"文件不存在，请重试");
+            ResponseUtil.responseFront(response, 500, "文件不存在，请重试");
         }
     }
 }
