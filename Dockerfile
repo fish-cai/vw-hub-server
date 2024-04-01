@@ -2,6 +2,7 @@ FROM ubuntu:latest
 
 # 设置环境变量
 ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8
 
 RUN sed -i 's@http://archive.ubuntu.com/ubuntu/@http://mirrors.tuna.tsinghua.edu.cn/ubuntu/@' /etc/apt/sources.list
 
