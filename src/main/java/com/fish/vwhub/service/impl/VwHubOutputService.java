@@ -51,7 +51,7 @@ public class VwHubOutputService extends ServiceImpl<VwHubOutputMapper, VwHubOutp
     public JSONObject parseExcelData(List<JSONObject> dataList) {
         JSONObject res = new JSONObject();
         JSONArray pointRes = new JSONArray();
-        JSONArray lineRes = new JSONArray();
+        JSONObject lineRes = new JSONObject();
         for (JSONObject jo : dataList) {
             String from = jo.getString("中转库城市");
             String to = jo.getString("覆盖城市");
@@ -79,7 +79,18 @@ public class VwHubOutputService extends ServiceImpl<VwHubOutputMapper, VwHubOutp
             coords.add(fromPoint);
             coords.add(toPoint);
             lineJo.put("coords", coords);
-            lineRes.add(lineJo);
+
+            JSONObject fromJo = lineRes.getJSONObject(from);
+            if (fromJo == null){
+                fromJo = new JSONObject();
+                lineRes.put(from,fromJo);
+            }
+            JSONArray fromTos = fromJo.getJSONArray("data");
+            if (fromTos == null){
+                fromTos = new JSONArray();
+                fromJo.put("data",fromTos);
+            }
+            fromTos.add(lineJo);
         }
         res.put("pointRes", pointRes);
         res.put("lineRes", lineRes);

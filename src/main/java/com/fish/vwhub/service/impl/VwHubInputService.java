@@ -1,6 +1,7 @@
 package com.fish.vwhub.service.impl;
 
 import cn.hutool.core.io.FileUtil;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -9,6 +10,8 @@ import com.fish.vwhub.entity.ResResult;
 import com.fish.vwhub.entity.VwHubInput;
 import com.fish.vwhub.entity.VwHubOutput;
 import com.fish.vwhub.mapper.VwHubInputMapper;
+import com.fish.vwhub.util.ExcelUtil;
+import com.fish.vwhub.util.GeoUtil;
 import com.fish.vwhub.util.PyCaller;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -81,8 +84,8 @@ public class VwHubInputService extends ServiceImpl<VwHubInputMapper, VwHubInput>
     public ResResult<String> start(Integer id) {
         VwHubInput input = this.getById(id);
         String fileName = input.getFileName();
-        if (!StringUtils.containsIgnoreCase(fileName,"input")) {
-            return ResResult.fail("500","当前关联的文件非输入文件，请重新操作");
+        if (!StringUtils.containsIgnoreCase(fileName, "input")) {
+            return ResResult.fail("500", "当前关联的文件非输入文件，请重新操作");
         }
         String inputFile = inputDir + id + "/";
         String outDir = outPutDir + id + "/";
@@ -103,7 +106,7 @@ public class VwHubInputService extends ServiceImpl<VwHubInputMapper, VwHubInput>
             e.printStackTrace();
             res = null;
         }
-        if (StringUtils.isBlank(res)){
+        if (StringUtils.isBlank(res)) {
             return ResResult.fail("500", "算法调用失败,请查看相关日志");
         }
         log.info("算法文件：{} 调用完成，结果：{}", inputFile + fileName, res);
@@ -120,5 +123,21 @@ public class VwHubInputService extends ServiceImpl<VwHubInputMapper, VwHubInput>
             out.setOutputFileName(name);
             outputService.save(out);
         }
+    }
+
+    public void testMap() {
+        try {
+            List<JSONObject> list = ExcelUtil.readExcelData(new File("/Users/caiwenlin/java/vw-hub-server/output/35/Location_Output_2.xlsx"));
+            for (JSONObject jo : list) {
+//                String from = jo.getString("中转库城市");
+                String to = jo.getString("覆盖城市");
+                if (GeoUtil.getGeo(to) == null) {
+                    System.out.println( to);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }

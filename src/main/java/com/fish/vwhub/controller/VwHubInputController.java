@@ -66,5 +66,10 @@ public class VwHubInputController {
     public void downLoadOut(HttpServletResponse response, Integer resultId) {
         outputService.downLoad(response, resultId);
     }
+
+    @GetMapping("/test")
+    public void test() {
+        inputService.testMap();
+    }
 }
 
