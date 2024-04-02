@@ -109,6 +109,10 @@ public class VwHubInputService extends ServiceImpl<VwHubInputMapper, VwHubInput>
         if (StringUtils.isBlank(res)) {
             return ResResult.fail("500", "算法调用失败,请查看相关日志");
         }
+        JSONObject jo = JSONObject.parseObject(res);
+        if (!jo.getBoolean("success")) {
+            return ResResult.fail("500", "算法调用失败,返回信息:" + jo.getString("message"));
+        }
         log.info("算法文件：{} 调用完成，结果：{}", inputFile + fileName, res);
         saveOutRes(outDir, id);
         return ResResult.success(res);
@@ -132,7 +136,7 @@ public class VwHubInputService extends ServiceImpl<VwHubInputMapper, VwHubInput>
 //                String from = jo.getString("中转库城市");
                 String to = jo.getString("覆盖城市");
                 if (GeoUtil.getGeo(to) == null) {
-                    System.out.println( to);
+                    System.out.println(to);
                 }
             }
         } catch (Exception e) {

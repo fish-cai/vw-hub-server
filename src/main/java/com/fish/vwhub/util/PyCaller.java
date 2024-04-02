@@ -42,9 +42,9 @@ public class PyCaller {
                     BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
                     while ((line = in.readLine()) != null) {
                         log.info("line:{}", line);
-//                        if (!JSON.isValid(line)) {
-//                            continue;
-//                        }
+                        if (!JSON.isValid(line)) {
+                            continue;
+                        }
                         stringBuilder.append(line);
                     }
                     in.close();
@@ -68,6 +68,7 @@ public class PyCaller {
             }
             String errS = errorBuilder.toString();
             if (!StringUtils.isEmpty(errS)) {
+
                 log.error("exec py fileName:{},methodName:{},param:{}, error::{}", fileName, methodName, param, errS);
             }
             cdl.countDown();

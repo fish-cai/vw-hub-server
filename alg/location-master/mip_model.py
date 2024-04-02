@@ -154,11 +154,11 @@ class MIPModel:
         objective.SetMinimization()
 
         # save lp model file
-        lp_model = solver.ExportModelAsLpFormat(False)
-        utils.save_to_file('./model/model.lp', lp_model)
+        # lp_model = solver.ExportModelAsLpFormat(False)
+        # utils.save_to_file('./model/model.lp', lp_model)
 
         # 设置日志输出到控制台
-        solver.EnableOutput()
+        # solver.EnableOutput()
 
         self.solver = solver
         self.x = x
@@ -170,7 +170,7 @@ class MIPModel:
         train_hub_city = self.train_hub_city
         ship_hub_city = self.ship_hub_city
         # solve
-        for it in range(1, 3):
+        for it in range(1, 21):
             self.reoptimize(it)
             solver = self.solver
             print("第" + str(it) + "次求解")

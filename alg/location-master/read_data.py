@@ -22,13 +22,23 @@ class Data:
 
     # @staticmethod
     def data_preprocess(self):
+        result = None
         excel_content = pd.read_excel(self.file_input_dir_name, sheet_name=None, index_col=0)
         # 返回所有 Sheets 对象的list
         names = list(excel_content.keys())
-        self.city_location = excel_content["Cost-Volume"].reset_index().set_index("城市")
-        # 选特定列
-        selected_columns = ["省份", "经度", "纬度", "销量", "合肥出发公路", "合肥出发铁路干线", "合肥出发水路干线"]
-        self.city_location = self.city_location.loc[:, selected_columns]
+        try:
+            self.city_location = excel_content["Cost-Volume"].reset_index().set_index("城市")
+            # 选特定列
+            selected_columns = ["省份", "经度", "纬度", "销量", "合肥出发公路", "合肥出发铁路干线", "合肥出发水路干线"]
+            self.city_location = self.city_location.loc[:, selected_columns]
+        except:
+            result = {
+                "success": False,
+                "code": "500",
+                "message": '请检查 Cost-Volume sheet 名称或列名： "省份", "经度", "纬度", "销量", "合肥出发公路", "合肥出发铁路干线", "合肥出发水路干线"'
+            }
+            print(json.dumps(result))
+            return False
         self.city_location.index = self.city_location.index.str.replace('市', '')
         # 去掉 "省份" 列中的 "省" 和 "市" 字样
         self.city_location["省份"] = self.city_location["省份"].str.replace('省', '').str.replace('市', '')
@@ -37,27 +47,45 @@ class Data:
 
         start_time = time.time()
         # distance_matrix 不存在则计算；如果存在了，就直接读取
-        if not os.path.exists('./data/distance_matrix.csv'):
-            print("开始计算距离矩阵")
-            self.calculate_distance_matrix()
-        else:
-            self.distance_matrix = pd.read_csv('./data/distance_matrix.csv', index_col=0)
+        try:
+            if not os.path.exists('./data/distance_matrix.csv'):
+                print("开始计算距离矩阵")
+                self.calculate_distance_matrix()
+            else:
+                self.distance_matrix = pd.read_csv('./data/distance_matrix.csv', index_col=0)
+        except:
+            result = {
+                "success": False,
+                "code": "500",
+                "message": '请检查距离矩阵计算'
+            }
+            print(json.dumps(result))
+            return False
         end_time = time.time()
         print("计算距离矩阵耗时：", end_time - start_time, "秒")
 
         # 公路、铁路和水路的费率
-        self.trans_cost = excel_content["Cost-Distribution"].reset_index()
-        selected_columns = ["范围起（≥）", "范围止（＜）", "公路费率", "总费用"]
-        self.trans_cost = self.trans_cost.loc[:, selected_columns]
-        self.trans_cost['边际成本'] = 0
-        for i in range(len(self.trans_cost)):
-            if i == 0:
-                self.trans_cost.loc[i, '边际成本'] = self.trans_cost.loc[i, '总费用']
-                self.trans_cost.loc[i, "总费用"] = self.trans_cost.loc[i, '总费用']
-            else:
-                self.trans_cost.loc[i, '边际成本'] = (self.trans_cost.loc[i, '范围止（＜）'] - self.trans_cost.loc[
-                    i, '范围起（≥）']) * self.trans_cost.loc[i, '公路费率'] + self.trans_cost.loc[i - 1, '边际成本']
-                self.trans_cost.loc[i, "总费用"] = 0
+        try:
+            self.trans_cost = excel_content["Cost-Distribution"].reset_index()
+            selected_columns = ["范围起（≥）", "范围止（＜）", "公路费率", "总费用"]
+            self.trans_cost = self.trans_cost.loc[:, selected_columns]
+            self.trans_cost['边际成本'] = 0
+            for i in range(len(self.trans_cost)):
+                if i == 0:
+                    self.trans_cost.loc[i, '边际成本'] = self.trans_cost.loc[i, '总费用']
+                    self.trans_cost.loc[i, "总费用"] = self.trans_cost.loc[i, '总费用']
+                else:
+                    self.trans_cost.loc[i, '边际成本'] = (self.trans_cost.loc[i, '范围止（＜）'] - self.trans_cost.loc[
+                        i, '范围起（≥）']) * self.trans_cost.loc[i, '公路费率'] + self.trans_cost.loc[i - 1, '边际成本']
+                    self.trans_cost.loc[i, "总费用"] = 0
+        except:
+            result = {
+                "success": False,
+                "code": "500",
+                "message": '请检查Cost-Distribution数据格式'
+            }
+            print(json.dumps(result))
+            return False
 
         # 备选Hubs 信息， 去掉城市重复的行
         self.train_hubs = excel_content["Regional hubs（Train)"].reset_index().drop(["货场名称"], axis=1)
@@ -83,6 +111,8 @@ class Data:
             # 添加到字典
             self.train_province_hubs[province] = train_hubs
             self.ship_province_hubs[province] = ship_hubs
+
+        return True
 
     # 基于 city_location 中的城市名和经纬度，计算任意两个城市之间的距离矩阵
     # def calculate_distance_matrix(self):

@@ -1,5 +1,5 @@
+import json
 import os
-import argparse
 
 from read_data import Data
 from mip_model import MIPModel
@@ -15,24 +15,26 @@ def location_optimize(file_input_names, file_out_dir):
         file_input_dir_name = '{}/{}'.format(file_input_dir, file_name)
         # 1. 数据处理
         data = Data(file_input_dir_name, file_out_dir, file_name)
-        data.data_preprocess()
+        if data.data_preprocess() is False:
+            return
 
         # 2. 基于MIP的运筹优化建模求解
         model = MIPModel(data, min_hub_num, max_hub_num, max_hub_delivery_distance, fix_hub_cost)
         model.construct_mip_model()
         model.optimize()
+        result = {
+            "success": True,
+            "code": "200",
+            "message": "优化完成"
+        }
+        print(json.dumps(result))
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--input_dir', help='输入文件目录')
-    parser.add_argument('--output_dir', help='输出文件目录')
-    args = parser.parse_args()
     # file_input_dir = "/Users/jinglong/meituan/location/data"  # 文件夹目录
-    # file_input_dir = "/Users/caiwenlin/java/vw-hub-server/alg/example/in/"  # 文件夹目录
-    # file_out_dir = '/Users/caiwenlin/java/vw-hub-server/alg/example/out/'
-    file_input_dir = args.input_dir
-    file_out_dir = args.output_dir
+    file_input_dir = "/Users/jinglong/meituan/location/actual_use"  # 文件夹目录
+    file_out_dir = '/Users/jinglong/meituan/location/out/'
+
     file_input_names = os.listdir(file_input_dir)  # 得到文件夹下的所有文件名称
 
     location_optimize(file_input_names, file_out_dir)
