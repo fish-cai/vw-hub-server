@@ -23,9 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author fish
@@ -119,12 +117,12 @@ public class VwHubInputService extends ServiceImpl<VwHubInputMapper, VwHubInput>
     }
 
     private void saveOutRes(String outputDir, Integer id) {
-        List<String> strings = FileUtil.listFileNames(outputDir);
-        for (String name : strings) {
+        File[] files = com.fish.vwhub.util.FileUtil.listFiles(outputDir);
+        for (File file : files) {
             VwHubOutput out = new VwHubOutput();
             out.setGmtCreate(new Date());
             out.setInputId(id);
-            out.setOutputFileName(name);
+            out.setOutputFileName(file.getName());
             outputService.save(out);
         }
     }

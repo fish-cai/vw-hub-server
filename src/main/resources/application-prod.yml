@@ -6,6 +6,9 @@ spring:
   datasource:
     driver-class-name: org.sqlite.JDBC
     url: jdbc:sqlite:/data/vwhub.db
+  mvc:
+    async:
+      request-timeout: 0
 
 
 vw:

@@ -9,6 +9,7 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -104,5 +105,29 @@ public class FileUtil {
         map.put("data", sb.toString());
         map.put("lineCount", lineCount + "");
         return map;
+    }
+
+    public static File[] listFiles(String outputDir) {
+        File[] files = new File(outputDir).listFiles();
+        // 排序文件数组按照创建时间
+        Arrays.sort(files, (f1, f2) -> {
+            long diff = f1.lastModified() - f2.lastModified();
+            if (diff > 0) {
+                return 1;
+            } else if (diff < 0) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+        return files;
+    }
+
+    public static void main(String[] args) {
+        File[] files = listFiles("/Users/yuyijun/Desktop/work/private/vw-hub-server/output/34");
+        for (File file : files) {
+            System.out.println(file.getName());
+        }
+//        System.out.println(Arrays.toString(listFiles("/Users/yuyijun/Desktop/work/private/vw-hub-server/output/34")));
     }
 }

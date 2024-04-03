@@ -42,7 +42,7 @@ public class PyCaller {
                     BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
                     while ((line = in.readLine()) != null) {
                         log.info("line:{}", line);
-                        if (!JSON.isValid(line)) {
+                        if (!JSON.isValidObject(line)) {
                             continue;
                         }
                         stringBuilder.append(line);
@@ -105,7 +105,7 @@ public class PyCaller {
                     BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
                     while ((line = in.readLine()) != null) {
                         log.info("line:{}", line);
-                        if (!JSON.isValid(line)) {
+                        if (!JSON.isValidObject(line)) {
                             continue;
                         }
                         stringBuilder.append(line);
@@ -141,6 +141,7 @@ public class PyCaller {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
+
         List<String[]> csvData = new ArrayList<>();
         List<String> params = new ArrayList<>();
         csvData.add(new String[]{"Time", "Value"});

@@ -48,6 +48,8 @@ class Data:
         start_time = time.time()
         # distance_matrix 不存在则计算；如果存在了，就直接读取
         try:
+            if not os.path.exists('./data'):
+                        os.makedirs('./data')
             if not os.path.exists('./data/distance_matrix.csv'):
                 print("开始计算距离矩阵")
                 self.calculate_distance_matrix()
