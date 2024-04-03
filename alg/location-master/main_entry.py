@@ -31,10 +31,15 @@ def location_optimize(file_input_names, file_out_dir):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input_dir', help='输入文件目录')
+    parser.add_argument('--output_dir', help='输出文件目录')
+    args = parser.parse_args()
     # file_input_dir = "/Users/jinglong/meituan/location/data"  # 文件夹目录
-    file_input_dir = "/Users/jinglong/meituan/location/actual_use"  # 文件夹目录
-    file_out_dir = '/Users/jinglong/meituan/location/out/'
-
+    # file_input_dir = "/Users/caiwenlin/java/vw-hub-server/alg/example/in/"  # 文件夹目录
+    # file_out_dir = '/Users/caiwenlin/java/vw-hub-server/alg/example/out/'
+    file_input_dir = args.input_dir
+    file_out_dir = args.output_dir
     file_input_names = os.listdir(file_input_dir)  # 得到文件夹下的所有文件名称
 
     location_optimize(file_input_names, file_out_dir)
