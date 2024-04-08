@@ -1,4 +1,5 @@
 import math
+import os
 
 import numpy as np
 import pandas as pd
@@ -35,7 +36,7 @@ class MIPModel:
         highway_hub_city = dict()
         for i, t in enumerate(self.data.train_hubs["城市"]):
             demand = self.data.city_location.loc[t, "销量"]
-            if t == "合肥" or t == "大理":
+            if t == "合肥":
                 train_hub_city[t] = solver.IntVar(1, 1, 'train_hub_%i' % i)
             elif demand < 0.5:
                 train_hub_city[t] = solver.IntVar(0, 0, 'train_hub_%i' % i)
@@ -112,6 +113,8 @@ class MIPModel:
         # cons.2 所有城市的需求都要被Hub满足
         for c in self.data.city_location.index:
             demand = self.data.city_location.loc[c, "销量"]
+            if demand <= 1:
+                demand = 0
             solver.Add(solver.Sum([y[(h, c, "train")] for h in self.data.train_hubs["城市"]] +
                                   [y[(h, c, "ship")] for h in self.data.ship_hubs["城市"]]) +
                        y[c] >= demand)
@@ -339,6 +342,8 @@ class MIPModel:
         summary_df = merged_df.copy().groupby(['中转库城市', '中转库省份', '干线运输方式']).apply(utils.custom_agg_function)
 
         # # Save all results to a single Excel file
+        if not os.path.exists("self.data.file_out_dir_name"):
+            os.makedirs("self.data.file_out_dir_name")
         self.result = self.data.file_out_dir_name + "/Location_Output_" + str(it) + '.csv'
         writer = pd.ExcelWriter(self.result.replace('.csv', '.xlsx'))  # Use ExcelWriter for multi-sheet output
 

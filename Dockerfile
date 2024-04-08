@@ -50,7 +50,7 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 ADD alg/ /py
 #COPY vwhub.db /data/vwhub.db
-RUN pip install --no-cache-dir --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
 RUN pip install -r /py/location-master/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 ADD target/vw-hub-server-1.0-SNAPSHOT.jar app.jar

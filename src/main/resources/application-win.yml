@@ -1,0 +1,29 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:D:\\vwhub\\backend\\data\\vwhub.db
+  mvc:
+    async:
+      request-timeout: 0
+
+
+vw:
+  hub:
+    input:
+      dir: D:\\vwhub\\backend\\data\\input\\
+    output:
+      dir: D:\\vwhub\\backend\\data\\output\\
+    map:
+      json: D:\\vwhub\\backend\\data\\static\\map.json
+    py:
+      dir: D:\\vwhub\\backend\\data\\py\\location-master\\
+logging:
+  level:
+    com:
+      fish:
+        vwhub:
+          mapper: debug
