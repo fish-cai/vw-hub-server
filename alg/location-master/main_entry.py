@@ -7,7 +7,7 @@ from mip_model import MIPModel
 
 
 def location_optimize(file_input_names, file_out_dir):
-    max_hub_num = 300
+    max_hub_num = 30
     min_hub_num = 0
     max_hub_delivery_distance = 1600
     fix_hub_cost = 0.1

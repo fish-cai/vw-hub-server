@@ -37,11 +37,11 @@ def calculate_cost_coef(trans_cost, distance):
 
 
 # 干线运输结果处理
-def main_trans_result(data, train_hub_city, ship_hub_city, x):
+def main_trans_result(data, z, x, w):
     city_installed = list()
     print(" ================= 干线成本相关，以及Hub城市 =================")
     for i, h in enumerate(data.train_hubs["城市"]):
-        if train_hub_city[h].solution_value() > 0:
+        if z[(h, "train")].solution_value() > 0:
             distance = int(data.distance_matrix.get("合肥").get(h, 99) * 10000) / 10000.0
             # hub 总销量
             total_hub_volume = calculate_hub_covered_volume(data, h, "train", x)
@@ -50,12 +50,13 @@ def main_trans_result(data, train_hub_city, ship_hub_city, x):
             transportation_time = calculate_train_transportation_time(volume_revised, distance)
 
             # hub 总成本
+            # print(w[(h, "train")].solution_value(),  total_hub_volume)
             cost = int(data.city_location.loc[h, "合肥出发铁路干线"] * total_hub_volume * 10000) / 10000.0
             h_province = data.city_location["省份"][h]
             city_installed.append([h, h_province, "铁路运输", distance, cost, prepare_time, transportation_time])
 
     for i, h in enumerate(data.ship_hubs["城市"]):
-        if ship_hub_city[h].solution_value() > 0:
+        if z[(h, "ship")].solution_value() > 0:
             distance = int(data.distance_matrix.get("合肥").get(h, 99) * 10000) / 10000.0
             prepare_time = 3
             transportation_time = math.ceil(distance / 500) + 1
