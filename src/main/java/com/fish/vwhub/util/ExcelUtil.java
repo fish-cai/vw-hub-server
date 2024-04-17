@@ -44,7 +44,7 @@ public class ExcelUtil {
             headers.add(value);
         }
         // 循环获取每一行数据
-        for (int i = 1; i < sheet.getPhysicalNumberOfRows() || i <= 101; i++) {
+        for (int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
             Row row = sheet.getRow(i);
             int numberOfCells = row.getPhysicalNumberOfCells();
             String[] tmp = new String[numberOfCells];
