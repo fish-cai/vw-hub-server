@@ -74,7 +74,7 @@ def main_trans_result(data, z, x, w):
                                               "干线（覆盖城市）总成本",
                                               '干线准备时间',
                                               '干线运输时间'])
-    print(city_installed_df)
+    # print(city_installed_df)
     return city_installed_df
 
 

@@ -215,8 +215,8 @@ class MIPModel:
         objective.SetMinimization()
 
         # save lp model file
-        lp_model = solver.ExportModelAsLpFormat(False)
-        utils.save_to_file('./model/model.lp', lp_model)
+        # lp_model = solver.ExportModelAsLpFormat(False)
+        # utils.save_to_file('./model/model.lp', lp_model)
 
         # 设置日志输出到控制台
         # solver.EnableOutput()
@@ -231,8 +231,10 @@ class MIPModel:
         z = self.z
         w = self.w
         # solve
-        for it in range(1, 21):
+        objective_value = list()
+        for it in range(1, 3):
             self.reoptimize(it)
+            objective_value.append(self.solver.Objective().Value())
             solver = self.solver
             print("第" + str(it) + "次求解")
             # 添加约束以排除当前解
@@ -261,12 +263,13 @@ class MIPModel:
                 total_direct_cost = self.data.city_location.loc[h, "合肥出发公路"] * self.data.city_location.loc[
                     h, "销量"]
                 exclude.SetCoefficient(x[h], total_direct_cost)
+        print(objective_value)
 
     def reoptimize(self, it):
         solver = self.solver
         status = solver.Solve()
-        print(
-            " -------------------------------------- result ----------------------------------------")
+        # print(
+        #     " -------------------------------------- result ----------------------------------------")
         if status == pywraplp.Solver.OPTIMAL:
 
             print('Objective value =', int(solver.Objective().Value()))
@@ -307,7 +310,7 @@ class MIPModel:
 
     # 末端配送计算结果
     def delivery_result(self):
-        print(" ================= 覆盖的城市 =================")
+        # print(" ================= 覆盖的城市 =================")
         cover_city = list()
         for i, h in enumerate(self.data.train_hubs["城市"]):
             for j, c in enumerate(self.data.city_location.index):
@@ -397,7 +400,7 @@ class MIPModel:
         merged_df['单台时间'] = merged_df['总时间/days']  # 单台时间 = 总时间/days
 
         # 展示处理后的DataFrame
-        print(merged_df)
+        # print(merged_df)
 
         # 计算summary 结果表
         # summary_df = utils.group_data(merged_df.copy())
@@ -406,6 +409,7 @@ class MIPModel:
 
         # # Save all results to a single Excel file
         self.result = self.data.file_out_dir_name + "/Location_Output_" + str(it) + '.csv'
+        # self.result = self.data.file_out_dir_name + '/' + self.data.file_name + "_Location_Output_" + str(it) + '.csv'
         writer = pd.ExcelWriter(self.result.replace('.csv', '.xlsx'))  # Use ExcelWriter for multi-sheet output
 
         # Save merged_df to the first sheet (default name "Sheet1")
