@@ -232,7 +232,7 @@ class MIPModel:
         w = self.w
         # solve
         objective_value = list()
-        for it in range(1, 3):
+        for it in range(1, 21):
             self.reoptimize(it)
             objective_value.append(self.solver.Objective().Value())
             solver = self.solver
