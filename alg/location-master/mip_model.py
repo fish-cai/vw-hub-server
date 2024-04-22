@@ -6,6 +6,16 @@ from ortools.linear_solver import pywraplp
 
 import utils
 
+# 设置pandas的显示长度，None代表无限制
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+
+# 设置显示宽度，-1代表自动检测显示宽度
+pd.set_option('display.width', None)
+
+# 设置显示列的宽度，None代表自动
+pd.set_option('display.max_colwidth', None)
+
 
 class MIPModel:
     def __init__(self, data, min_hub_num, max_hub_num, max_hub_delivery_distance, fix_hub_cost):
@@ -23,7 +33,7 @@ class MIPModel:
         self.hubs = './out/' + "Hub cities" + '.csv'
         self.result = './out/' + "Location Result"
 
-    def construct_mip_model(self):
+    def construct_mip_model(self, block):
         # Create the mip solver with the SCIP backend.
         solver = pywraplp.Solver.CreateSolver('SCIP')
         # solver = pywraplp.Solver.CreateSolver('CPLEX')
@@ -32,6 +42,8 @@ class MIPModel:
         # Variables :
         z = dict()  # 新增变量，表示一个城市是否建站点
         w = dict()  # 新增变量，表示一个城市站点覆盖的需求
+        # 如果有block_solution，则直接使用block_solution中的第i个
+
         for i, t in enumerate(self.data.train_hubs["城市"]):
             demand = self.data.city_location.loc[t, "销量"]
             if t == "合肥":
@@ -59,15 +71,21 @@ class MIPModel:
         # train
         for i, h in enumerate(self.data.train_hubs["城市"]):
             for j, c in enumerate(self.data.city_location.index):
+
                 if_access = 0
                 h_province = self.data.city_location["省份"][h]
                 c_province = self.data.city_location["省份"][c]
                 # hub 对应的省份覆盖了哪些范围，不可超过
                 if (c_province[:3] in self.data.train_province_hubs[h_province] or
-                    c_province[:2] in self.data.train_province_hubs[h_province]):
+                        c_province[:2] in self.data.train_province_hubs[h_province]):
                     if_access = 1
                 x[(h, c, "train")] = solver.IntVar(0, int(if_access), 'x_%s_%s_train' % (h, c))
                 y[(h, c, "train")] = solver.IntVar(0, infinity, 'y_%s_%s_train' % (h, c))
+                for b in block:
+                    if b[2] == "train" and h == b[0] and c == b[1]:
+                        print(b)
+                        x[(h, c, "train")] = solver.IntVar(0, 0, 'x_%s_%s_train' % (h, c))
+
                 solver.Add(y[(h, c, "train")] <= self.bigM * x[(h, c, "train")])
 
         # ship
@@ -80,8 +98,16 @@ class MIPModel:
                 if (c_province[:3] in self.data.train_province_hubs[h_province] or
                         c_province[:2] in self.data.train_province_hubs[h_province]):
                     if_access = 1
+                # if block and block[2] == "ship":
+                #     if h == block[0] and c == block[1]:
+                #         print(block)
+                #         if_access = 0
                 x[(h, c, "ship")] = solver.IntVar(0, int(if_access), 'x_%s_%s_ship' % (h, c))
                 y[(h, c, "ship")] = solver.IntVar(0, infinity, 'y_%s_%s_ship' % (h, c))
+                for b in block:
+                    if b[2] == "ship" and h == b[0] and c == b[1]:
+                        print(b)
+                        x[(h, c, "ship")] = solver.IntVar(0, int(if_access), 'x_%s_%s_ship' % (h, c))
                 solver.Add(y[(h, c, "ship")] <= self.bigM * x[(h, c, "ship")])
 
         # direct
@@ -91,7 +117,7 @@ class MIPModel:
             y[s] = solver.IntVar(0, 2 * int(demand), 'y_合肥_%s' % s)
             solver.Add(y[s] <= self.bigM * x[s])
 
-        print('Number of variables =', solver.NumVariables())
+        # print('Number of variables =', solver.NumVariables())
 
         # Constraints
         # cons.1 最多选择 N 个 Station，即所有的 self.data.city_location.index，判断任何一个城市train 或者 ship 是否访问
@@ -149,8 +175,7 @@ class MIPModel:
             for ship in self.data.ship_hubs["城市"]:
                 if h != ship:
                     continue
-                solver.Add(z[(h, "train")] + z[(ship, "ship")] <= 1,  name=f"z_{h}_only_one")
-
+                solver.Add(z[(h, "train")] + z[(ship, "ship")] <= 1, name=f"z_{h}_only_one")
 
         # 约束：每个省份铁路库不超过2个，水运库不超过2个（可以同时2个铁+2个水）
         for i, h in enumerate(self.data.train_hubs["城市"]):
@@ -183,7 +208,7 @@ class MIPModel:
             solver.Add(solver.Sum([z[(c, "ship")] * p[c] for c in self.data.ship_hubs["城市"]]) <= 2,
                        name=f"z_{h}_ship_province")
 
-        print('Number of constraints =', solver.NumConstraints())
+        # print('Number of constraints =', solver.NumConstraints())
 
         # objective
         objective = solver.Objective()
@@ -226,57 +251,27 @@ class MIPModel:
         self.z = z
         self.w = w
 
-    def optimize(self):
+    def optimize(self, it):
         x = self.x
         z = self.z
         w = self.w
+        block_solution = list()
         # solve
-        objective_value = list()
-        for it in range(1, 21):
-            self.reoptimize(it)
-            objective_value.append(self.solver.Objective().Value())
-            solver = self.solver
-            print("第" + str(it) + "次求解")
-            # 添加约束以排除当前解
-            exclude = solver.Constraint(solver.Objective().Value() - 1 + it * 10000, solver.infinity())
-            # 固定成本
-            for h in self.data.train_hubs["城市"]:
-                exclude.SetCoefficient(z[(h, "train")], self.fix_hub_cost)
-            for h in self.data.ship_hubs["城市"]:
-                exclude.SetCoefficient(z[(h, "ship")], self.fix_hub_cost)
-
-            # 运输成本
-            for h in self.data.train_hubs["城市"]:
-                for c in self.data.city_location.index:
-                    volume = self.data.city_location.loc[c, "销量"]
-                    distance = self.data.distance_matrix.get(h).get(c, 99999)
-                    total_train_cost = self.calculate_distribute_cost(c, distance)
-                    exclude.SetCoefficient(x[(h, c, "train")], total_train_cost)
-                    exclude.SetCoefficient(w[(h, "train")], self.data.city_location.loc[h, "合肥出发铁路干线"])
-            for h in self.data.ship_hubs["城市"]:
-                for c in self.data.city_location.index:
-                    distance = self.data.distance_matrix.get(h).get(c, 99999)
-                    total_ship_cost = self.calculate_distribute_cost(c, distance)
-                    exclude.SetCoefficient(x[(h, c, "ship")], total_ship_cost)
-                    exclude.SetCoefficient(w[(h, "ship")], self.data.city_location.loc[h, "合肥出发水路干线"])
-            for h in self.data.city_location.index:
-                total_direct_cost = self.data.city_location.loc[h, "合肥出发公路"] * self.data.city_location.loc[
-                    h, "销量"]
-                exclude.SetCoefficient(x[h], total_direct_cost)
-        print(objective_value)
-
-    def reoptimize(self, it):
-        solver = self.solver
-        status = solver.Solve()
-        # print(
-        #     " -------------------------------------- result ----------------------------------------")
+        status = self.solver.Solve()
         if status == pywraplp.Solver.OPTIMAL:
 
-            print('Objective value =', int(solver.Objective().Value()))
-            print('Time = ', solver.WallTime(), ' milliseconds')
-            print('Problem solved in %f milliseconds' % solver.wall_time())
-            print('Problem solved in %d iterations' % solver.iterations())
-            print('Problem solved in %d branch-and-bound nodes' % solver.nodes())
+            print('Objective value =', int(self.solver.Objective().Value()))
+
+            for i, h in enumerate(self.data.train_hubs["城市"]):
+                for j, c in enumerate(self.data.city_location.index):
+                    if self.x[(h, c, "train")].solution_value() > 0:
+                        if h != c:
+                            block_solution.append((h, c, "train"))
+            for i, h in enumerate(self.data.ship_hubs["城市"]):
+                for j, c in enumerate(self.data.city_location.index):
+                    if self.x[(h, c, "ship")].solution_value() > 0:
+                        if h != c:
+                            block_solution.append((h, c, "ship"))
             # 干线运输结果处理
             city_installed_df = utils.main_trans_result(self.data, self.z, self.x, self.w)
 
@@ -288,6 +283,8 @@ class MIPModel:
 
         else:
             print('The problem does not have an optimal solution.')
+
+        return block_solution
 
     # 计算总成本
     def calculate_total_cost(self, hub, city, main_line_type_from_hefei):
@@ -401,6 +398,8 @@ class MIPModel:
 
         # 展示处理后的DataFrame
         # print(merged_df)
+        # merged_df['总成本/￥']  求和
+        print('总成本/￥', merged_df['总成本/￥'].sum())
 
         # 计算summary 结果表
         # summary_df = utils.group_data(merged_df.copy())
@@ -408,17 +407,18 @@ class MIPModel:
             utils.custom_agg_function)
 
         # # Save all results to a single Excel file
-        self.result = self.data.file_out_dir_name + "/Location_Output_" + str(it) + '.csv'
+        self.result = self.data.file_out_dir_name + "/Location_Output_" + str(merged_df['总成本/￥'].sum()) + '.csv'
         # self.result = self.data.file_out_dir_name + '/' + self.data.file_name + "_Location_Output_" + str(it) + '.csv'
         writer = pd.ExcelWriter(self.result.replace('.csv', '.xlsx'))  # Use ExcelWriter for multi-sheet output
 
         # Save merged_df to the first sheet (default name "Sheet1")
         merged_df.to_excel(writer, sheet_name='Location', index=False)
-        print('Result (merged_df) saved to sheet "Location" in:', self.result.replace('.csv', '.xlsx'))
+        # print('Result (merged_df) saved to sheet "Location" in:', self.result.replace('.csv', '.xlsx'))
 
         # Save summary_df to a separate sheet named "Summary"
         summary_df.to_excel(writer, sheet_name='Summary', index=False)
-        print('Summary (summary_df) saved to sheet "Summary" in:', self.result.replace('.csv', '.xlsx'))
+        # print('Summary (summary_df) saved to sheet "Summary" in:', self.result.replace('.csv', '.xlsx'))
 
         # writer.save()  # Close the writer to finalize the Excel file
         writer.close()  # 正确的方法来关闭和保存 Excel 文件
+

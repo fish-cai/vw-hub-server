@@ -1,7 +1,19 @@
 # some utils
 import math
-
+import os
+import shutil
+import re
 import pandas as pd
+
+# 设置pandas的显示长度，None代表无限制
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+
+# 设置显示宽度，-1代表自动检测显示宽度
+pd.set_option('display.width', None)
+
+# 设置显示列的宽度，None代表自动
+pd.set_option('display.max_colwidth', None)
 
 
 def save_to_file(file_name, contents):
@@ -39,7 +51,7 @@ def calculate_cost_coef(trans_cost, distance):
 # 干线运输结果处理
 def main_trans_result(data, z, x, w):
     city_installed = list()
-    print(" ================= 干线成本相关，以及Hub城市 =================")
+    # print(" ================= 干线成本相关，以及Hub城市 =================")
     for i, h in enumerate(data.train_hubs["城市"]):
         if z[(h, "train")].solution_value() > 0:
             distance = int(data.distance_matrix.get("合肥").get(h, 99) * 10000) / 10000.0
@@ -117,3 +129,82 @@ def custom_agg_function(group):
     # 按中转库城市、中转库省份和干线运输方式分组并聚合数据
     grouped_df = group.groupby(['中转库城市', '中转库省份', '干线运输方式']).apply(custom_agg_function)
     return grouped_df
+
+
+def clear_directory(folder_path):
+    # 检查文件夹是否存在
+    if os.path.exists(folder_path):
+        # 获取文件夹内所有文件和文件夹的名字
+        for filename in os.listdir(folder_path):
+            # 拼接完整的文件或文件夹路径
+            file_path = os.path.join(folder_path, filename)
+            try:
+                # 如果是文件夹，则递归删除
+                if os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+                # 如果是文件，则直接删除
+                else:
+                    os.unlink(file_path)
+            except Exception as e:
+                print(f'删除失败。错误信息: {e}')
+    else:
+        print("指定的文件夹不存在。")
+
+
+#    file_out_dir 下有很多xlsx文件,我需要解析所有文件的文件名，取其中数字进行升序排列
+
+def rename_files_and_select_top_20(file_out_dir):
+    # 获取文件夹中所有的xlsx文件名
+    file_names = [f for f in os.listdir(file_out_dir) if f.endswith('.xlsx')]
+
+    # 提取文件名中的数字，并与原文件名一起存储
+    files_with_numbers = []
+    numbers_seen = set()  # 用于记录已经出现过的数字
+    for file_name in file_names:
+        # 使用正则表达式提取文件名中的数字
+        numbers = re.findall(r'\d+', file_name)
+        if numbers:
+            # 假设每个文件名中只有一个数字
+            number = int(numbers[0])
+            if number not in numbers_seen:
+                files_with_numbers.append((file_name, number))
+                numbers_seen.add(number)
+            else:
+                # 如果数字已经出现过，则删除该文件
+                os.remove(os.path.join(file_out_dir, file_name))
+                print(f'文件 {file_name} 因编号重复已被删除')
+
+    # 按数字升序排序
+    files_with_numbers.sort(key=lambda x: x[1])
+
+    # 重命名所有文件
+    for i, (original_file_name, _) in enumerate(files_with_numbers, start=1):
+        # 构造新的文件名
+        new_file_name = f'Temp_Location_Output_{i:03}.xlsx'
+        # 构造原文件和新文件的完整路径
+        original_file_path = os.path.join(file_out_dir, original_file_name)
+        new_file_path = os.path.join(file_out_dir, new_file_name)
+        # 重命名文件
+        os.rename(original_file_path, new_file_path)
+        print(f'文件 {original_file_name} 已临时重命名为 {new_file_name}')
+
+    # 重新获取重命名后的所有文件名
+    renamed_file_names = [f for f in os.listdir(file_out_dir) if f.startswith('Temp_Location_Output_')]
+
+    # 仅保留TOP 20的文件，删除其他文件
+    for file_name in renamed_file_names[20:]:
+        os.remove(os.path.join(file_out_dir, file_name))
+        print(f'文件 {file_name} 超出TOP 20范围，已被删除')
+
+    # 对TOP 20的文件进行最终重命名
+    for i, file_name in enumerate(renamed_file_names[:20], start=1):
+        # 构造新的文件名
+        new_file_name = f'Location_Output_{i:02}.xlsx'
+        # 构造原文件和新文件的完整路径
+        original_file_path = os.path.join(file_out_dir, file_name)
+        new_file_path = os.path.join(file_out_dir, new_file_name)
+        # 重命名文件
+        os.rename(original_file_path, new_file_path)
+        print(f'文件 {file_name} 已最终重命名为 {new_file_name}')
+
+
