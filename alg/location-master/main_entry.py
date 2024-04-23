@@ -40,6 +40,7 @@ def location_optimize(file_input_names, file_out_dir):
             else:
                 model.optimize(it)
 
+        utils.rename_files_and_select_top_20(file_out_dir)
         # 3. 结果状态输出
         result = {
             "success": True,
@@ -62,6 +63,3 @@ if __name__ == '__main__':
     file_input_names = os.listdir(file_input_dir)  # 得到文件夹下的所有文件名称
 
     location_optimize(file_input_names, file_out_dir)
-
-    utils.rename_files_and_select_top_20(file_out_dir)
-
