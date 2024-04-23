@@ -92,3 +92,5 @@ build/
 /data/logs/applog-20240327-0.log.gz
 /data/logs/applog-20240402-0.log.gz
 /data/logs/applog-20240403-0.log.gz
+/input/
+/output/

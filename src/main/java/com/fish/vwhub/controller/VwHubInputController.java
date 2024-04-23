@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,8 +54,8 @@ public class VwHubInputController {
     }
 
     @GetMapping("/start")
-    public ResResult<String> start(@RequestParam Integer id) {
-        return inputService.start(id);
+    public ResResult<String> start(@RequestParam Integer id, HttpServletRequest request) {
+        return inputService.start(id,request);
     }
 
     @GetMapping("/view")

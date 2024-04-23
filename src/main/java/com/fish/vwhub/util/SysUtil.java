@@ -2,6 +2,7 @@ package com.fish.vwhub.util;
 
 import lombok.extern.slf4j.Slf4j;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -277,6 +278,19 @@ public class SysUtil {
     public static void main(String[] args) throws Exception {
         List<String> getAllMonthInTheDateRange = getAllMonthInTheDateRange("2022-12", "2023-11");
         System.out.println(getAllMonthInTheDateRange);
+    }
+
+    public static String getIP(HttpServletRequest request){
+        // 获取客户端的源 IP 地址
+        String ipAddress = request.getRemoteAddr();
+
+        // 如果你需要考虑代理服务器的情况，可以这样获取 X-Forwarded-For 头部
+        String forwardedFor = request.getHeader("X-Forwarded-For");
+        if (forwardedFor != null && !forwardedFor.isEmpty()) {
+            // X-Forwarded-For 可能包含多个 IP 地址，以逗号分隔，第一个 IP 地址是客户端的真实 IP
+            ipAddress = forwardedFor.split(",")[0];
+        }
+        return ipAddress;
     }
 
 }

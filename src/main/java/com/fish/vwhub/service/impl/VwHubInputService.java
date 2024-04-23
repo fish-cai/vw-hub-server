@@ -13,6 +13,7 @@ import com.fish.vwhub.mapper.VwHubInputMapper;
 import com.fish.vwhub.util.ExcelUtil;
 import com.fish.vwhub.util.GeoUtil;
 import com.fish.vwhub.util.PyCaller;
+import com.fish.vwhub.util.SysUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -79,7 +81,8 @@ public class VwHubInputService extends ServiceImpl<VwHubInputMapper, VwHubInput>
         return inputMapper.manualPage(page);
     }
 
-    public ResResult<String> start(Integer id) {
+    public ResResult<String> start(Integer id, HttpServletRequest request) {
+        log.info("用户启动任务，id:{},用户ip：{}", id, SysUtil.getIP(request));
         VwHubInput input = this.getById(id);
         String fileName = input.getFileName();
         if (!StringUtils.containsIgnoreCase(fileName, "input")) {
@@ -111,7 +114,7 @@ public class VwHubInputService extends ServiceImpl<VwHubInputMapper, VwHubInput>
         if (!jo.getBoolean("success")) {
             return ResResult.fail("500", "算法调用失败,返回信息:" + jo.getString("message"));
         }
-        log.info("算法文件：{} 调用完成，结果：{}", inputFile + fileName, res);
+        log.info("算法文件：{} 调用完成，结果：{},ip:{}", inputFile + fileName, res, SysUtil.getIP(request));
         saveOutRes(outDir, id);
         return ResResult.success(res);
     }
