@@ -128,7 +128,7 @@ public class VwHubInputService extends ServiceImpl<VwHubInputMapper, VwHubInput>
     }
 
     private void saveOutRes(String outputDir, Integer id) {
-        File[] files = com.fish.vwhub.util.FileUtil.listFiles(outputDir);
+        File[] files = new File(outputDir).listFiles();
         for (File file : files) {
             VwHubOutput out = new VwHubOutput();
             out.setGmtCreate(new Date());
