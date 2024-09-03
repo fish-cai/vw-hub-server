@@ -279,12 +279,13 @@ class MIPModel:
             cover_city_df = self.delivery_result()
 
             # 合并结果
-            self.merged_result(city_installed_df, cover_city_df, it)
+            merged_df, summary_df, Total_cost = self.merged_result(city_installed_df, cover_city_df, it)
 
         else:
             print('The problem does not have an optimal solution.')
+            merged_df, summary_df = None, None
 
-        return block_solution
+        return block_solution, merged_df, summary_df, Total_cost
 
     # 计算总成本
     def calculate_total_cost(self, hub, city, main_line_type_from_hefei):
@@ -405,7 +406,11 @@ class MIPModel:
         # summary_df = utils.group_data(merged_df.copy())
         summary_df = merged_df.copy().groupby(['中转库城市', '中转库省份', '干线运输方式']).apply(
             utils.custom_agg_function)
+        
+        Total_cost = merged_df['总成本/￥'].sum()
 
+        return merged_df, summary_df, Total_cost
+        '''
         # # Save all results to a single Excel file
         self.result = self.data.file_out_dir_name + "/Location_Output_" + str(merged_df['总成本/￥'].sum()) + '.csv'
         # self.result = self.data.file_out_dir_name + '/' + self.data.file_name + "_Location_Output_" + str(it) + '.csv'
@@ -421,4 +426,4 @@ class MIPModel:
 
         # writer.save()  # Close the writer to finalize the Excel file
         writer.close()  # 正确的方法来关闭和保存 Excel 文件
-
+        '''

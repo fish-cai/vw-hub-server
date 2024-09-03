@@ -153,7 +153,29 @@ def clear_directory(folder_path):
 
 #    file_out_dir 下有很多xlsx文件,我需要解析所有文件的文件名，取其中数字进行升序排列
 
-def rename_files_and_select_top_20(file_out_dir):
+def rename_files_and_select_top_20(file_out_dir, all_merged_results, Total_cost_results):
+    # 将all_merged_results和Total_cost_results按索引顺序配对
+    paired_results = list(zip(all_merged_results, Total_cost_results))
+    
+    # 按Total_cost_results中的元素从小到大排序
+    paired_results.sort(key=lambda x: x[1])
+    
+    # 只保留前20个元素
+    top_20_results = paired_results[:20]
+    
+    # 生成20个Excel文件
+    for i, ((merged_df, summary_df), _) in enumerate(top_20_results, start=1):
+        # 构造新的文件名
+        new_file_name = f'Location_Output_{i:02}.xlsx'
+        new_file_path = os.path.join(file_out_dir, new_file_name)
+        
+        # 将merged_df和summary_df写入Excel文件
+        with pd.ExcelWriter(new_file_path) as writer:
+            merged_df.to_excel(writer, sheet_name='Location', index=False)
+            summary_df.to_excel(writer, sheet_name='Summary', index=False)
+        
+        print(f'文件 {new_file_name} 已生成')
+    '''
     # 获取文件夹中所有的xlsx文件名
     file_names = [f for f in os.listdir(file_out_dir) if f.endswith('.xlsx')]
 
@@ -206,5 +228,5 @@ def rename_files_and_select_top_20(file_out_dir):
         # 重命名文件
         os.rename(original_file_path, new_file_path)
         print(f'文件 {file_name} 已最终重命名为 {new_file_name}')
-
+    '''
 

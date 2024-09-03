@@ -12,6 +12,8 @@ def location_optimize(file_input_names, file_out_dir):
     min_hub_num = 0
     max_hub_delivery_distance = 1600
     fix_hub_cost = 0.1
+    all_merged_results = [] #HZy新加
+    Total_cost_results = [] #HZy新加
     for i, file_name in enumerate(file_input_names):
         print(i + 1, file_name)
         file_input_dir_name = '{}/{}'.format(file_input_dir, file_name)
@@ -36,11 +38,15 @@ def location_optimize(file_input_names, file_out_dir):
 
             model.construct_mip_model(block)
             if it == 1:
-                block_solution = model.optimize(it)
+                block_solution, merged_df, summary_df, Total_cost = model.optimize(it)
             else:
-                model.optimize(it)
+                _, merged_df, summary_df, Total_cost = model.optimize(it)
 
-        utils.rename_files_and_select_top_20(file_out_dir)
+            if merged_df is not None and summary_df is not None:
+                all_merged_results.append((merged_df, summary_df))
+                Total_cost_results.append(Total_cost)
+
+        utils.rename_files_and_select_top_20(file_out_dir, all_merged_results, Total_cost_results)
         # 3. 结果状态输出
         result = {
             "success": True,

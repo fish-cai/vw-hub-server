@@ -20,5 +20,6 @@
         SELECT *
         FROM vw_hub_output
         WHERE input_id = #{inputId}
+        order by output_file_name
     </select>
 </mapper>
