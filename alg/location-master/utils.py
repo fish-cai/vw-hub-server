@@ -160,8 +160,16 @@ def rename_files_and_select_top_20(file_out_dir, all_merged_results, Total_cost_
     # 按Total_cost_results中的元素从小到大排序
     paired_results.sort(key=lambda x: x[1])
     
+    # 删除Total_cost_results的值相同的元素
+    unique_paired_results = []
+    seen_costs = set()
+    for result in paired_results:
+        if result[1] not in seen_costs:
+            unique_paired_results.append(result)
+            seen_costs.add(result[1])
+
     # 只保留前20个元素
-    top_20_results = paired_results[:20]
+    top_20_results = unique_paired_results[:20]
     
     # 生成20个Excel文件
     for i, ((merged_df, summary_df), _) in enumerate(top_20_results, start=1):

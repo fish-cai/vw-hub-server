@@ -116,13 +116,6 @@ public class VwHubInputService extends ServiceImpl<VwHubInputMapper, VwHubInput>
         }
         log.info("算法文件：{} 调用完成，结果：{},ip:{}", inputFile + fileName, res, SysUtil.getIP(request));
 
-        // 确保文件生成和重命名完成
-        try {
-            Thread.sleep(5000); // 等待5秒，确保文件系统操作完成
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         saveOutRes(outDir, id);
         return ResResult.success(res);
     }
