@@ -1,11 +1,12 @@
-docker build -t vw-hub-server:v0.1 -f Dockerfile .
+打包：mvn package -DskipTests=true
+编译：docker build -t vw-hub-server:v0.1 -f Dockerfile .
 docker build -t vw-hub-server:v0.1 --platform=linux/amd64  -f Dockerfile .
 
 
-docker tag vw-hub-server:v0.1 121.36.222.8:5000/vw-hub-server:v0.1
-docker push 121.36.222.8:5000/vw-hub-server:v0.1
-
-docker run -d -v /home/vwhub/back/data:/data -p 8080:8080 localhost:5000/vw-hub-server:v0.1
-
+tag：docker tag vw-hub-server:v0.1 121.36.222.8:5000/vw-hub-server:v0.1
+推镜像：docker push 121.36.222.8:5000/vw-hub-server:v0.1
+拉镜像：121.36.222.8:5000/vw-hub-server:v0.1
+run镜像：docker run -d -v /home/vwhub/back/data:/data -p 8080:8080 localhost:5000/vw-hub-server:v0.1
+run镜像：docker run -d -v /home/vwhub/back/data:/data -p 8080:8080 vw-hub-server:v0.1
 
 python3 /py/location-master/main_entry.py --input_dir /data/input/37/ --output_dir /data/output/37/
